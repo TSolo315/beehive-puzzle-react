@@ -8,10 +8,15 @@ function Tile(props) {
   const y = props.columnNumber;
 
   function handleClick() {
-    activeTile ? props.setters.setBeeCount(props.values.beeCount - 1) : props.setters.setBeeCount(props.values.beeCount + 1)
-    setActiveTile(!activeTile);
     let newLayout = props.values.layout.slice()
-    newLayout[x][y] = true
+    if (activeTile) {
+      props.setters.setBeeCount(props.values.beeCount - 1)
+      newLayout[x][y] = false
+    } else {
+      props.setters.setBeeCount(props.values.beeCount + 1)
+      newLayout[x][y] = true
+    }
+    setActiveTile(!activeTile);
     props.setters.setLayout(newLayout)
   }
 

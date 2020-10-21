@@ -7,6 +7,10 @@ function *enumerate(iterable) {
   }
 }
 
+export function sleep(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
 export function processStep(board) {
   let addedBee = false
   let addedBeeList = []
@@ -42,4 +46,19 @@ export function processStep(board) {
       })
   };
   return [addedBee, addedBeeList]
+}
+
+export function calculateScore(board, beesAdded, turnsTaken) {
+  let totalActiveTiles = 0
+  for (let row of board) {
+      for (let tile of row) {
+          if (tile) {
+              totalActiveTiles+= 1
+          }
+      }
+  }
+  let missedTiles = 146 - totalActiveTiles
+  let beeScore = 146 - (beesAdded * 2)
+  let turnScore = (100 - turnsTaken - (missedTiles * 2))
+  return beeScore + turnScore
 }

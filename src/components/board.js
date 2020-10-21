@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {processStep} from './game.js'
+import {processStep, calculateScore, sleep} from './game.js'
 
 
 function Tile(props) {
@@ -13,7 +13,7 @@ function Tile(props) {
     if (props.values.layout[x][y] !== activeTile) {
       setActiveTile(!activeTile)
     }
-  });
+  }, [props.values.layout, x, y, activeTile]);
 
 
   function handleClick() {
@@ -80,9 +80,10 @@ function SimulateButton(props) {
     props.setters.setLayout(newLayout)
   }
 
-  function handleClick() {
+  async function handleClick() {
     let turns = 0
     while (true) {
+      await sleep(850)
       let [addedBee, beesToAdd] = processStep(props.values.layout)
       if (!addedBee) {
         break
@@ -97,6 +98,24 @@ function SimulateButton(props) {
   return (
     <div className="button-container">
         <button type="button" className="sim-button" onClick={handleClick} >Simulate</button>
+    </div>
+  )
+}
+
+function GameOverOverlay(props) {
+  return (
+    <div className="overlay overlay-slidedown">
+        <div className="modal">
+            <div className="modal-header">
+                <h2>Simulation Complete!</h2>
+            </div>
+            <div className="modal-body">
+                <p id="puzzle-bees"></p>
+                <p id="puzzle-turns"></p>
+                <p id="puzzle-score"></p>
+                <button className="restart-button" id="play-again">Play Again</button>
+            </div>
+        </div>
     </div>
   )
 }
@@ -142,11 +161,14 @@ function Board() {
   }
 
   return (
-    <div className="hive">
-      <BeeCounter beeCount={beeCount} />
-      {rows}
-      <TurnCounter turnCount={turnCount} />
-      <SimulateButton setters={setters} values={values} />
+    <div>
+      <div className="hive">
+        <BeeCounter beeCount={beeCount} />
+        {rows}
+        <TurnCounter turnCount={turnCount} />
+        <SimulateButton setters={setters} values={values} />
+      </div>
+      <GameOverOverlay setters={setters} values={values} />
     </div>
   )
 }

@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {processStep} from './game.js'
+
 
 function Tile(props) {
 
-  const [activeTile, setActiveTile] = useState(false);
-
   const x = props.rowNumber;
   const y = props.columnNumber;
+
+  const [activeTile, setActiveTile] = useState(false);
+
+  useEffect(() => {
+    if (props.values.layout[x][y] !== activeTile) {
+      setActiveTile(!activeTile)
+    }
+  });
+
 
   function handleClick() {
     let newLayout = props.values.layout.slice()
@@ -58,6 +67,40 @@ function TurnCounter(props) {
   )
 }
 
+function SimulateButton(props) {
+
+  function addBees(beeList) {
+    let newLayout = props.values.layout.slice()
+    beeList.forEach((tile, index) => {
+      let x = tile[0]
+      let y = tile[1]
+      newLayout[x][y] = true
+      console.log(`bee added at ${x},${y}`)
+    });
+    props.setters.setLayout(newLayout)
+  }
+
+  function handleClick() {
+    let turns = 0
+    while (true) {
+      let [addedBee, beesToAdd] = processStep(props.values.layout)
+      if (!addedBee) {
+        break
+      }
+      turns += 1
+      addBees(beesToAdd)
+      props.setters.setTurnCount(turns)
+      console.log('endturn')
+    }
+  }
+
+  return (
+    <div className="button-container">
+        <button type="button" className="sim-button" onClick={handleClick} >Simulate</button>
+    </div>
+  )
+}
+
 function Board() {
 
   function createLayout() {
@@ -86,9 +129,11 @@ function Board() {
   const [beeCount, setBeeCount] = useState(0);
   const [turnCount, setTurnCount] = useState(0);
   const setters = {setLayout: setLayout,
-                   setBeeCount: setBeeCount,}
+                   setBeeCount: setBeeCount,
+                   setTurnCount: setTurnCount}
   const values = {layout: layout,
-                  beeCount: beeCount,}
+                  beeCount: beeCount,
+                  turnCount: turnCount}
   const rows = []
   for (let row of layout) {
     rows.push(
@@ -101,6 +146,7 @@ function Board() {
       <BeeCounter beeCount={beeCount} />
       {rows}
       <TurnCounter turnCount={turnCount} />
+      <SimulateButton setters={setters} values={values} />
     </div>
   )
 }

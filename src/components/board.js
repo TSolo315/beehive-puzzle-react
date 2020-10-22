@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import {processStep, calculateScore, sleep} from './game.js'
 
 
@@ -17,6 +17,9 @@ function Tile(props) {
 
 
   function handleClick() {
+    if (props.values.clickLock) {
+      return
+    }
     let newLayout = props.values.layout.slice()
     if (activeTile) {
       props.setters.setBeeCount(props.values.beeCount - 1)
@@ -40,7 +43,7 @@ function Row(props) {
   const tiles = []
   for (let i = 0; i < props.tileCount; i++) {
     tiles.push(
-      <Tile key={props.rowNumber.toString() + i.toString()} columnNumber={i} rowNumber={props.rowNumber} setters={props.setters} values={props.values} />
+      <Tile key={props.rowNumber.toString() + '-' + i.toString()} columnNumber={i} rowNumber={props.rowNumber} setters={props.setters} values={props.values} />
     )
   }
 
@@ -75,12 +78,15 @@ function SimulateButton(props) {
       let x = tile[0]
       let y = tile[1]
       newLayout[x][y] = true
-      console.log(`bee added at ${x},${y}`)
     });
     props.setters.setLayout(newLayout)
   }
 
   async function handleClick() {
+    if (props.values.clickLock) {
+      return
+    }
+    props.setters.setClickLock(true)
     let turns = 0
     while (true) {
       await sleep(850)
@@ -93,6 +99,7 @@ function SimulateButton(props) {
       props.setters.setTurnCount(turns)
       console.log('endturn')
     }
+    props.setters.setGameOver(true)
   }
 
   return (
@@ -103,17 +110,30 @@ function SimulateButton(props) {
 }
 
 function GameOverOverlay(props) {
+
+  const [gameScore, setGameScore] = useState(0);
+  useEffect(() => {
+    function cleanUpGameScore() {
+      setGameScore(0)
+    }
+    if (props.values.gameOver) {
+      setGameScore(calculateScore(props.values.layout, props.values.beeCount, props.values.turnCount))
+      console.log(gameScore.current)
+    }
+    return cleanUpGameScore
+  }, [gameScore, props.values.gameOver, props.values.beeCount, props.values.layout, props.values.turnCount]);
+  
   return (
-    <div className="overlay overlay-slidedown">
+    <div className={`overlay overlay-slidedown ${props.values.gameOver ? 'open' : ''}`}>
         <div className="modal">
             <div className="modal-header">
                 <h2>Simulation Complete!</h2>
             </div>
             <div className="modal-body">
-                <p id="puzzle-bees"></p>
-                <p id="puzzle-turns"></p>
-                <p id="puzzle-score"></p>
-                <button className="restart-button" id="play-again">Play Again</button>
+                <p>Bee Count: {props.values.beeCount}</p>
+                <p>Turn Count: {props.values.turnCount}</p>
+                <p>Score: {gameScore}</p>
+                <button className="restart-button" id="play-again" onClick={props.resetGameFunction} >Play Again</button>
             </div>
         </div>
     </div>
@@ -147,17 +167,31 @@ function Board() {
   const [layout, setLayout] = useState(createLayout());
   const [beeCount, setBeeCount] = useState(0);
   const [turnCount, setTurnCount] = useState(0);
+  const [clickLock, setClickLock] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
   const setters = {setLayout: setLayout,
                    setBeeCount: setBeeCount,
-                   setTurnCount: setTurnCount}
+                   setTurnCount: setTurnCount,
+                   setClickLock: setClickLock,
+                   setGameOver: setGameOver}
   const values = {layout: layout,
                   beeCount: beeCount,
-                  turnCount: turnCount}
+                  turnCount: turnCount,
+                  clickLock: clickLock,
+                  gameOver: gameOver}
   const rows = []
   for (let row of layout) {
     rows.push(
       <Row key={rows.length.toString()} tileCount={row.length} rowNumber={rows.length} setters={setters} values={values} />
     )
+  }
+
+  function resetGame() {
+    setLayout(createLayout())
+    setGameOver(false)
+    setBeeCount(0)
+    setTurnCount(0)
+    setClickLock(false)
   }
 
   return (
@@ -168,7 +202,7 @@ function Board() {
         <TurnCounter turnCount={turnCount} />
         <SimulateButton setters={setters} values={values} />
       </div>
-      <GameOverOverlay setters={setters} values={values} />
+      <GameOverOverlay resetGameFunction={resetGame} setters={setters} values={values} />
     </div>
   )
 }

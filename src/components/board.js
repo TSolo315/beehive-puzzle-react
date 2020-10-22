@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import {processStep, calculateScore, sleep} from './game.js'
+import {processStep, calculateScore, sleep} from '../logic/game.js'
 
 
 function Tile(props) {

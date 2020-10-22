@@ -2,7 +2,7 @@
 
 A quick puzzle game created using react.js
 
-
+https://raw.githubusercontent.com/TSolo315/beehive-puzzle-react/master/image/beehive-puzzle.png
 
 ## Instructions
 

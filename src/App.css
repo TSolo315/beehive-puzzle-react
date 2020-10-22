@@ -33,7 +33,15 @@ body {
 
 .rules-link {
   margin-top: .25em;
+    background: none!important;
+  border: none;
+  padding: 0!important;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
   color: orange;
+  text-decoration: underline;
+  cursor: pointer;
   font-size: 18px;
 }
 
@@ -202,7 +210,7 @@ body {
   text-align: center;
   margin: 0 auto;
   width: 80%;
-  color: orange;
+  color: black;
   font-size: 24px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -213,6 +221,48 @@ body {
 
 .instruction-list li {
   margin-top: .75em;
+}
+
+.instruction-modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.instruction-modal.open {
+  display: block
+}
+
+/* Modal Content */
+.instruction-modal-content {
+  background-color: #e8f0e6;
+  margin: auto;
+  padding: 20px;
+  border: 2px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.instruction-modal-close {
+  color: #888;
+  float: right;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.instruction-modal-close:hover,
+.instruction-modal-close:focus {
+  color: rgb(204, 23, 23);
+  text-decoration: none;
+  cursor: pointer;
 }
 
 @media only screen and (max-height: 800px) {

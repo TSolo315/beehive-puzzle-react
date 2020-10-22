@@ -1,6 +1,30 @@
 import React, { useState, useEffect} from 'react';
 import {processStep, calculateScore, sleep} from '../logic/game.js'
 
+function InstructionModal(props) {
+
+  function closeInstructions() {
+    props.setOpen(false)
+  }
+  return(
+    <div className={`instruction-modal ${props.open ? 'open' : ''}`}>
+
+      <div className="instruction-modal-content">
+        <span className="instruction-modal-close" onClick={closeInstructions} >&times;</span>
+        <div class="instruction-list">
+          <ul>
+              <li>The goal is to repopulate the hive in as few rounds as possible and by placing as few bees as possible.</li>
+              <li>You can place a bee on the board by clicking on a hexagonal tile.</li>
+              <li>A tile that is touching three bee tiles will be converted into a bee tile.</li>
+              <li>When you click simulate tiles will be converted in rounds until either no tiles are converted or the entire hive has been repopulated.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  )
+}
+
 
 function Tile(props) {
 
@@ -75,9 +99,7 @@ function SimulateButton(props) {
   function addBees(beeList) {
     let newLayout = props.values.layout.slice()
     beeList.forEach((tile, index) => {
-      let x = tile[0]
-      let y = tile[1]
-      newLayout[x][y] = true
+      newLayout[tile[0]][tile[1]] = true
     });
     props.setters.setLayout(newLayout)
   }
@@ -169,6 +191,7 @@ function Board() {
   const [turnCount, setTurnCount] = useState(0);
   const [clickLock, setClickLock] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [instructionsOpen, setInstructionsOpen] = useState(false);
   const setters = {setLayout: setLayout,
                    setBeeCount: setBeeCount,
                    setTurnCount: setTurnCount,
@@ -179,11 +202,15 @@ function Board() {
                   turnCount: turnCount,
                   clickLock: clickLock,
                   gameOver: gameOver}
-  const rows = []
+  const hiveRows = []
   for (let row of layout) {
-    rows.push(
-      <Row key={rows.length.toString()} tileCount={row.length} rowNumber={rows.length} setters={setters} values={values} />
+    hiveRows.push(
+      <Row key={hiveRows.length.toString()} tileCount={row.length} rowNumber={hiveRows.length} setters={setters} values={values} />
     )
+  }
+
+  function openInstructions() {
+    setInstructionsOpen(true)
   }
 
   function resetGame() {
@@ -196,13 +223,19 @@ function Board() {
 
   return (
     <div>
+      <div className="page-heading">
+        <h1 className="page-title">Beehive Puzzle</h1>
+        <h3 className="subtitle">How efficiently can you repopulate the hive?</h3>
+        <button className="rules-link" onClick={openInstructions}>Instructions</button>
+      </div>
       <div className="hive">
         <BeeCounter beeCount={beeCount} />
-        {rows}
+        {hiveRows}
         <TurnCounter turnCount={turnCount} />
         <SimulateButton setters={setters} values={values} />
       </div>
       <GameOverOverlay resetGameFunction={resetGame} setters={setters} values={values} />
+      <InstructionModal open={instructionsOpen} setOpen={setInstructionsOpen} />
     </div>
   )
 }

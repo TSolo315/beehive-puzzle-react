@@ -119,7 +119,6 @@ function SimulateButton(props) {
       turns += 1
       addBees(beesToAdd)
       props.setters.setTurnCount(turns)
-      console.log('endturn')
     }
     props.setters.setGameOver(true)
   }
@@ -140,7 +139,6 @@ function GameOverOverlay(props) {
     }
     if (props.values.gameOver) {
       setGameScore(calculateScore(props.values.layout, props.values.beeCount, props.values.turnCount))
-      console.log(gameScore.current)
     }
     return cleanUpGameScore
   }, [gameScore, props.values.gameOver, props.values.beeCount, props.values.layout, props.values.turnCount]);
